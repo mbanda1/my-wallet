@@ -1,19 +1,7 @@
-import { Schema, model, connect, connection } from 'mongoose';
+import { connect, connection } from 'mongoose';
+import { Account, User } from './models';
 
-interface IUser {
-    id: Number
-    name: string;
-    email?: string;
-}
-
-const userSchema = new Schema<IUser>({
-    name: { type: String, required: true },
-    email: { type: String, required: false },
-});
-
-const User = model<IUser>('User', userSchema);
-
-const dbConnect = () =>
+export const dbConnect = () =>
     connect('mongodb://127.0.0.1:27017/wallet').
         catch(error => console.log(error));
 
@@ -25,18 +13,38 @@ connection.on('error', err => {
     console.log(err);
 });
 
-async function initRun() {
 
-    const user = new User({
-        name: 'Nixon',
-        email: 'test@gmail.com',
-    });
-    await user.save();
+const modelsToCreate = [
+    { name: 'Users', model: User },
+    { name: 'Accounts', model: Account },
+  ];
 
-    console.log(user.email);
-}
+  async function createModelsIfNotExist() {
+    try {
+      for (const { name, model } of modelsToCreate) {
+        if (!connection.models[name]) {
+    
+          await model.createCollection();
+          console.log(`${name} model created`);
+        }
+      }
+      console.log('Migration upto date');
+    } catch (error) {
+      console.error('Error during migration:', error);
+      throw error;
+    }
+  }
 
-initRun()
+  async function runMigration() {
+    try {
+      await dbConnect();
+      await createModelsIfNotExist();
+    } catch (error) {
+      console.error('Migration error:', error);
+      process.exit(1);
+    }
+  }
+  
 
-export default dbConnect
+export default runMigration
 
