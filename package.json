@@ -1,0 +1,40 @@
+{
+  "name": "wallet-system",
+  "version": "0.0.1",
+  "description": "wallet system with basic functionality to credit and debit a wallet account.",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbanda1/my-wallet.git"
+  },
+  "keywords": [
+    "es6+",
+    "TypeScript",
+    "Mongoose",
+    "ODM"
+  ],
+  "author": "mbanda1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbanda1/my-wallet/issues"
+  },
+  "homepage": "https://github.com/mbanda1/my-wallet#readme",
+  "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "express": "^4.19.0",
+    "mongoose": "^8.2.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}
