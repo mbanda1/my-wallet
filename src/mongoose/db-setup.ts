@@ -1,9 +1,9 @@
-import { connection } from "mongoose";
+import { connect, connection } from "mongoose";
+import { DB_URI } from "../../config";
 import { Account, User } from "./models";
-import { connect } from "mongoose";
 
 export const dbConnect = async () =>
-    await connect('mongodb://127.0.0.1:27017/wallet')
+    await connect(DB_URI)
         .then(() => console.log('Db connected.'))
         .catch(error => console.error(error));
 

@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { Express, NextFunction, Request, Response } from "express";
+import { PORT } from '../config';
 import logger from './logger';
 import mongooseDb from "./mongoose";
 import transactionRoutes from './routes//transaction';
@@ -24,6 +25,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send(err.message || 'Something went wrong');
 });
 
-app.listen(3001, () => {
-  logger.info(`[server]: Server is running at http://localhost:3001`);
+app.listen(PORT, () => {
+  logger.info(`[server]: Server is running at ${PORT}`);
 });

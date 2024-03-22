@@ -1,8 +1,9 @@
 import { connect, connection } from 'mongoose';
+import { DB_URI } from '../../config';
 import logger from '../logger';
 
 export const dbConnect = () =>
-    connect('mongodb://127.0.0.1:27017/wallet').
+    connect(DB_URI).
         catch(error => logger.error(error));
 
 connection.on('connected', () => logger.info('DB connected'));
