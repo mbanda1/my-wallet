@@ -15,9 +15,9 @@ const userSchema = new Schema<IUser>({
 
 export const User: Model<IUser> = model('Users', userSchema);
 
-interface IAccount extends Document {
+export interface IAccount extends Document {
     accountId: string
-    balance: Number;
+    balance: number;
     active: Boolean,
     updatedAt: Date;
 }
