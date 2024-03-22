@@ -4,10 +4,10 @@
   "description": "wallet system with basic functionality to credit and debit a wallet account.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.ts",
+    "start": "node src/index.js | pino-pretty",
+    "dev": "nodemon src/index.ts | pino-pretty",
     "build": "tsc",
-    "test": "test"
+    "test": "set NODE_ENV=test & jest --watch"
   },
   "repository": {
     "type": "git",
@@ -27,14 +27,20 @@
   "homepage": "https://github.com/mbanda1/my-wallet#readme",
   "dependencies": {
     "@types/mongoose": "^5.11.97",
+    "cors": "^2.8.5",
     "express": "^4.19.0",
     "express-validator": "^7.0.1",
     "jest": "^29.7.0",
-    "mongoose": "^8.2.2"
+    "mongoose": "^8.2.2",
+    "pino": "^8.19.0",
+    "pino-pretty": "^11.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.3",
     "@babel/preset-env": "^7.24.3",
+    "@babel/preset-typescript": "^7.24.1",
+    "@jest/globals": "^29.7.0",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.30",
     "babel-jest": "^29.7.0",
