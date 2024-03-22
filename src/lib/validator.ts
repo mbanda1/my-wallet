@@ -14,6 +14,7 @@ export const validateRequestBody = () => async (req: Request, res: Response, nex
   } catch (error) {
     const err = new APIError({
       message: 'Data supplied does not match the schema',
+      status: 400
     });
     return next(err);
   }

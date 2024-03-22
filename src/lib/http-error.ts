@@ -1,7 +1,10 @@
-export const APIError = class extends Error {
-    constructor({message, stack}: {message:string, stack?:string}) {
-        super(message!)
-        this.name = this.constructor.name
-        this.stack = stack
+export class APIError extends Error {
+    public status: number;
+
+    constructor({ message, status, stack }: { message: string, status: number, stack?: string }) {
+        super(message);
+        this.name = this.constructor.name;
+        this.status = status;
+        this.stack = stack;
     }
 }

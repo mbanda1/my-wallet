@@ -5,6 +5,7 @@ import logger from './logger';
 import mongooseDb from "./mongoose";
 import transactionRoutes from './routes//transaction';
 import walletRoutes from './routes/wallet';
+import { APIError } from './lib/http-error';
 
 const app: Express = express();
 
@@ -21,9 +22,15 @@ mongooseDb()
 
 // error middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  logger.error((err.stack))
-  res.status(500).send(err.message || 'Something went wrong');
-});
+  logger.error((err.stack && err.stack || err.message))
+  if (err instanceof APIError) {
+      res.status(err.status || 500).json(err.message);
+  } else {
+    res.status(500).send(err.message || 'Something went wrong');
+  }
+})
+
+
 
 app.listen(PORT, () => {
   logger.info(`[server]: Server is running at ${PORT}`);
