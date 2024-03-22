@@ -21,7 +21,7 @@ mongooseDb()
 // error middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error((err.stack))
-  res.status(500).send('Something went wrong');
+  res.status(500).send(err.message || 'Something went wrong');
 });
 
 app.listen(3001, () => {
