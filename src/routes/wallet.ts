@@ -6,7 +6,7 @@ const router = Router();
 
 const accountCreditRules = [
     body('accountId').notEmpty().withMessage('Account is required'),
-    body('amount').notEmpty().isNumeric().withMessage('Enter valid amount'),
+    body('amount').notEmpty().isInt({ min: 0 }).withMessage('Enter valid amount'),
   ];
 
 router.post('/credit', accountCreditRules, credit);
