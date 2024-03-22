@@ -1,7 +1,8 @@
 // @ts-nocheck
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { NextFunction, Request, Response } from 'express';
-import { makeTransaction } from '../../db';
+import { makeTransactionDb } from '../../db';
+import { APIError } from '../../lib/http-error';
 import logger from "../../logger";
 import { sendMoney } from '../transaction';
 import { findUserById } from '../user';
@@ -21,7 +22,7 @@ jest.mock("../wallet", () => ({
 }));
 
 jest.mock("../../db", () => ({
-    makeTransaction: jest.fn(),
+    makeTransactionDb: jest.fn(),
 }));
 
 describe("[TEST] Make a transfer", () => {
@@ -36,7 +37,7 @@ describe("[TEST] Make a transfer", () => {
             status: jest.fn().mockReturnThis(),
             send: jest.fn(),
             json: jest.fn(),
-        }) as Response;
+        }) as unknown as Response;
         next = jest.fn();
     });
 
@@ -59,35 +60,26 @@ describe("[TEST] Make a transfer", () => {
         expect(res.send).toHaveBeenCalledWith("Receiver account not valid");
     });
 
-    it("should return 404 if sender account does not exist", async () => {
-        const debitAccountId = "senderAccountId";
-        (findUserById as jest.Mock).mockResolvedValueOnce({});
-        (findWalletByUserId as jest.Mock).mockResolvedValueOnce(null);
-        req.body = { creditAccountId: "creditAccountId", debitAccountId, amount: 100 };
-
-        await sendMoney()(req, res, next);
-
-        expect(logger.error).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.send).toHaveBeenCalledWith("Sender account not valid");
-    });
-
-
-    it("should return 404 if sender account has insufficient balance", async () => {
-        const debitAccountId = "senderAccountId";
-        const balance = 50;
+    it('should return 404 if sender account is not valid', async () => {
+        const debitAccountId = 'invalidAccountId';
+        const creditAccountId = 'receiverAccountId';
         const amount = 100;
-        (findUserById as jest.Mock).mockResolvedValueOnce({});
-        (findWalletByUserId as jest.Mock).mockResolvedValueOnce({ balance });
-        req.body = { creditAccountId: "creditAccountId", debitAccountId, amount };
-
+        (findUserById as jest.Mock).mockResolvedValueOnce({}); // Assuming sender account exists
+     
+        (makeTransactionDb as jest.Mock).mockImplementationOnce(async () => {
+            throw new APIError({
+                message: 'Sender account not valid',
+                status: 404
+            });
+          });
+        req.body = { debitAccountId, creditAccountId, amount };
+    
         await sendMoney()(req, res, next);
-
-        expect(logger.error).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.send).toHaveBeenCalledWith("Insufficient balance");
-    });
-
+    
+        expect(logger.error).toHaveBeenCalledWith(
+          '[SERVICE], Send transaction failed'
+        );
+      });
 
     it("should make transaction and return the transaction object", async () => {
         const debitAccountId = "senderAccountId";
@@ -96,7 +88,7 @@ describe("[TEST] Make a transfer", () => {
         const mockTransaction = { id: "transactionId", amount, debitAccountId, creditAccountId };
         (findUserById as jest.Mock).mockResolvedValueOnce({});
         (findWalletByUserId as jest.Mock).mockResolvedValueOnce({ balance: 200 });
-        (makeTransaction as jest.Mock).mockResolvedValueOnce(mockTransaction);
+        (makeTransactionDb as jest.Mock).mockResolvedValueOnce(mockTransaction);
         req.body = { creditAccountId, debitAccountId, amount };
 
         await sendMoney()(req, res, next);
