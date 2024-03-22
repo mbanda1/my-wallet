@@ -1,16 +1,17 @@
 import { connect, connection } from 'mongoose';
+import logger from '../logger';
 import { Account, User } from './models';
 
 export const dbConnect = () =>
     connect('mongodb://127.0.0.1:27017/wallet').
-        catch(error => console.log(error));
+        catch(error => logger.error(error));
 
-connection.on('connected', () => console.log('DB connected'));
+connection.on('connected', () => logger.info('DB connected'));
 
-connection.on('disconnected', () => console.log('DB disconnected'));
+connection.on('disconnected', () => logger.info('DB disconnected'));
 
 connection.on('error', err => {
-    console.log(err);
+    logger.error(err)
 });
 
 
@@ -25,12 +26,12 @@ const modelsToCreate = [
         if (!connection.models[name]) {
     
           await model.createCollection();
-          console.log(`${name} model created`);
+          logger.info(`[Model Create] ${name} model created`)
         }
       }
-      console.log('Migration upto date');
+      logger.info('Migration upto date');
     } catch (error) {
-      console.error('Error during migration:', error);
+      logger.error(error, 'Error during migration:');
       throw error;
     }
   }
@@ -40,7 +41,7 @@ const modelsToCreate = [
       await dbConnect();
       await createModelsIfNotExist();
     } catch (error) {
-      console.error('Migration error:', error);
+      logger.error(error, 'Migration error:');
       process.exit(1);
     }
   }

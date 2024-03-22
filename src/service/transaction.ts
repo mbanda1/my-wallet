@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { startSession } from 'mongoose';
+import logger from '../logger';
 import { getUserById } from './user';
 import { getWalletByUserId, updateWalletBalance } from './wallet';
 
 export const sendMoney = () => async (req: Request, res: Response, next: NextFunction) => {
     try {
+        logger.info(`[SERVICE], Start send transaction`)
+
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -38,13 +41,16 @@ export const sendMoney = () => async (req: Request, res: Response, next: NextFun
         } else {
             return res.status(404).send('Insufficient balance');
         }
-
+        logger.info(`[SERVICE], End send transaction`)
     } catch (error) {
+        logger.error(`[SERVICE], Send transaction failed`)
         next(error);
     }
 }
 
 const transact = async ({ debitAccountId, creditAccountId, amount }: { debitAccountId: string, creditAccountId: string, amount: number }) => {
+    logger.info({ debitAccountId, creditAccountId, amount }, `[SERVICE], Start: Debit and credit transaction`)
+    
     const session = await startSession();
     session.startTransaction();
 
@@ -57,8 +63,11 @@ const transact = async ({ debitAccountId, creditAccountId, amount }: { debitAcco
 
         session.endSession();
 
+       logger.info({ debitAccountId, creditAccountId, amount }, `[SERVICE], Finished: Debit and credit transaction`)
+
         return { debitAccount, creditAccount };
     } catch (error) {
+        logger.error({ debitAccountId, creditAccountId, amount }, `[SERVICE], Debit and credit transaction failed`)
         session.endSession();
 
         throw error;
