@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { makeTransaction } from '../db';
+import { makeTransactionDb } from '../db';
 import logger from '../logger';
 import { findUserById } from './user';
-import { findWalletByUserId } from './wallet';
 
 export const sendMoney = () => async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -17,23 +16,13 @@ export const sendMoney = () => async (req: Request, res: Response, next: NextFun
             return res.status(404).send('Receiver account not valid');
         }
 
-        const debitAccount = await findWalletByUserId({ account: debitAccountId })
-        if (!debitAccount) {
-            return res.status(404).send('Sender account not valid');
-        }
+        const transaction = await makeTransactionDb({
+            debitAccountId,
+            creditAccountId,
+            amount,
+        })
+        res.status(201).json(transaction);
 
-
-        if (debitAccount.balance >= amount) {
-            const transaction = await makeTransaction({
-                debitAccountId,
-                creditAccountId,
-                amount,
-            })
-            res.status(201).json(transaction);
-
-        } else {
-            return res.status(404).send('Insufficient balance');
-        }
         logger.info(`[SERVICE], End send transaction`)
     } catch (error) {
         logger.error(`[SERVICE], Send transaction failed`)

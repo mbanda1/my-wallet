@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import { getWalletByUserId, upsertWalletBalance } from '../db';
+import { debitWalletDb, getWalletByUserId, upsertWalletBalance } from '../db';
 import logger from '../logger';
 import { findUserById } from './user';
 
 export const findWalletByUserId = async ({ account }: { account: string }) => {
-    logger.info({account}, `[SERVICE], Get wallet by used id`)
-    
+    logger.info({ account }, `[SERVICE], Get wallet by used id`)
+
     return getWalletByUserId({ accountId: account })
 }
 
@@ -25,6 +25,27 @@ export const creditWallet = () => async (req: Request, res: Response, next: Next
         logger.info('[SERVICE], End credit operation')
     } catch (error) {
         logger.error('[SERVICE], Credit operation failed')
+        next(error);
+    }
+}
+
+
+export const debitWallet = () => async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        logger.info('[SERVICE], Start debit operation')
+
+        const checkAccount = await findUserById({ id: req.body.accountId })
+
+        if (!checkAccount) {
+            return res.status(404).send('Account not valid');
+        }
+
+        const debitTheWallet = await debitWalletDb({ amount: req.body.amount, accountId: req.body.accountId })
+
+        res.status(201).json(debitTheWallet);
+        logger.info('[SERVICE], End debit operation')
+    } catch (error) {
+        logger.error('[SERVICE], Debit operation failed')
         next(error);
     }
 }

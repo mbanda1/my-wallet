@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { credit } from '../controllers/wallet';
+import { credit, debit } from '../controllers/wallet';
 import { body } from 'express-validator';
 
 const router = Router();
@@ -10,5 +10,6 @@ const accountCreditRules = [
   ];
 
 router.post('/credit', accountCreditRules, credit);
+router.post('/debit', accountCreditRules, debit);
 
 export default router;
