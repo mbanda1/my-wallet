@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express';
-import { credit, debit } from '../controllers/wallet';
+import { Router } from 'express';
 import { body } from 'express-validator';
+import { credit, debit } from '../controllers/wallet';
 
 const router = Router();
 

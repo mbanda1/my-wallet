@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import { APIError } from "./http-error";
+import { APIError, ErrorModel } from "./http-error";
 
-export const validateRequestBody = () => async (req: Request, res: Response, next: NextFunction) => {
+export const validateRequestBody = () => async (req: Request, res: Response, next: NextFunction)
+      : Promise<void | Response<Record<string, ErrorModel>>> => {
   try {
     const errors = validationResult(req);
 

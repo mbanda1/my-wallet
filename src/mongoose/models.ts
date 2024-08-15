@@ -29,4 +29,4 @@ const  accountSchema = new Schema<IAccount>({
     updatedAt: { type: Date, default: Date.now },
 });
 
-export const Account = model<IAccount>('Accounts', accountSchema);
+export const Account: Model<IAccount> = model('Accounts', accountSchema);
